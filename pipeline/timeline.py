@@ -11,9 +11,10 @@ NFRAMES = int(DUR * FPS)
 VO_TEMPO = 1.05  # locução levemente acelerada (atempo), sem mudar o timbre
 
 # Tempos por palavra de cada fala, no arquivo original (antes do atempo).
+# "bet" é escrito "bétchi" no texto enviado ao TTS para sair com pronúncia brasileira.
 VO_WORDS = {
-    "l1": [(0.00, 0.22, "Sem"), (0.22, 0.46, "bet"), (0.46, 0.82, "legal,"), (1.12, 1.26, "o"),
-           (1.26, 1.34, "que"), (1.34, 1.70, "sobra?")],
+    "l1": [(0.00, 0.20, "Sem"), (0.20, 0.56, "bétchi"), (0.56, 0.86, "legal,"), (1.28, 1.40, "o"),
+           (1.40, 1.48, "que"), (1.48, 1.86, "sobra?")],
     "l2": [(0.00, 0.14, "As"), (0.14, 0.56, "legais"), (0.56, 0.80, "podem"), (0.80, 1.20, "sair."),
            (1.80, 2.10, "Mas"), (2.10, 2.30, "quem"), (2.30, 2.46, "já"), (2.46, 2.78, "opera"),
            (2.78, 3.08, "fora"), (3.08, 3.26, "da"), (3.26, 3.48, "lei,"), (3.80, 3.96, "não"),
@@ -30,8 +31,8 @@ VO_WORDS = {
     "l5": [(0.00, 0.26, "Você"), (0.26, 0.58, "tira"), (0.58, 0.64, "a"), (0.64, 1.04, "regra."),
            (1.66, 1.98, "Tira"), (1.98, 2.08, "a"), (2.08, 2.76, "fiscalização."), (3.32, 3.66, "E"),
            (3.66, 3.74, "o"), (3.74, 4.18, "ilegal"), (4.18, 4.46, "continua.")],
-    "l6": [(0.00, 0.20, "Sem"), (0.20, 0.44, "bet"), (0.44, 0.84, "legal,"), (1.28, 1.52, "só"),
-           (1.52, 1.90, "resta"), (1.90, 1.90, "o"), (1.90, 2.14, "crime.")],
+    "l6": [(0.00, 0.18, "Sem"), (0.18, 0.58, "bétchi"), (0.58, 0.90, "legal,"), (1.16, 1.38, "só"),
+           (1.38, 1.82, "resta"), (1.82, 1.96, "o"), (1.96, 2.16, "crime.")],
 }
 
 # Onde cada fala entra na timeline (segundos).
