@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 import ui
 from common import (C, F, fit_font, prog, clamp, lerp, e_out3, e_inout3, e_outexpo, e_outback, hash01, rgba,
                     paste_text, glow, vgrad, zoom, darken, kit_meta, shake_at, flash_at)
-from timeline import W, H, FPS, w, HOOK_SRC0
+from timeline import W, H, FPS, w, HOOK_SRC0, HOOK_IMPACT
 
 BLACK = Image.new("RGB", (W, H), C["black"])
 WHITE = Image.new("RGB", (W, H), (255, 255, 255))
@@ -83,9 +83,9 @@ class S1(Scene):
                 img = Image.blend(img, Image.new("RGB", (W, H), (200, 0, 10)), 0.35)
             else:
                 img = self.clips.get("hook", HOOK_SRC0 + t)
-                punch = 0.22 * (1 - e_outexpo(prog(t, 0, 0.35)))
+                punch = 0.22 * (1 - e_outexpo(prog(t, HOOK_IMPACT, HOOK_IMPACT + 0.35)))
                 img = zoom(img, 1.04 + punch + 0.05 * prog(t, 0, self.t_cut), 0.5, 0.55)
-                img = darken(img, 1 - 0.4 * prog(t, 0.25, 0.45))
+                img = darken(img, 1 - 0.4 * prog(t, HOOK_IMPACT + 0.1, HOOK_IMPACT + 0.3))
                 img = self.siren(img, t)
             lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
             d = ImageDraw.Draw(lay)
@@ -98,7 +98,8 @@ class S1(Scene):
                 paste_text(lay, wd, self.big, rgba(C["white"]), W / 2, 700 + i * 300, anchor="ms",
                            scale=1 + 0.7 * (1 - e_outexpo(p)), alpha=min(1, 0.3 + p * 2))
             img = over(img, lay)
-            fl = max(flash_at(t, [0.0], 0.14, 0.9), flash_at(t, self.slams, 0.1, 0.3))
+            fl = max(flash_at(t, [0.0], 0.07, 0.6), flash_at(t, [HOOK_IMPACT], 0.14, 0.9),
+                     flash_at(t, self.slams, 0.1, 0.3))
             if fl > 0:
                 img = Image.blend(img, WHITE, fl)
             return img
@@ -124,7 +125,7 @@ class S1(Scene):
             g = 0.7 * (1 - t / 0.1)
         elif 0 <= t - self.t_cut < 0.07:
             g = 0.55
-        return dict(glitch=g, shake=shake_at(t, [0.0] + self.slams, 0.22, 24))
+        return dict(glitch=g, shake=shake_at(t, [HOOK_IMPACT] + self.slams, 0.22, 26))
 
 
 # ------------------------------------------------------------------ S2

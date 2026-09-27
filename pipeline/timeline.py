@@ -62,7 +62,7 @@ GRADE_DOC = "eq=contrast=1.12:brightness=-0.035:saturation=0.72:gamma=0.96,color
 GRADE_COOL = "eq=contrast=1.10:brightness=-0.02:saturation=0.70,colorbalance=rs=-0.06:bs=0.08:rm=-0.02:bm=0.03"
 SHOTS = {
     "hook":  dict(src="ai_hook.mp4", ss=0.0, dur=5.0, crop="v",
-                  grade="eq=contrast=1.18:brightness=-0.02:saturation=0.85,colorbalance=rs=-0.03:bs=0.04"),
+                  grade="eq=contrast=1.38:brightness=-0.11:saturation=0.95:gamma=0.85,colorbalance=rs=-0.04:bs=0.05"),
     "op":    dict(src="ai_opening.mp4", ss=0.0, dur=5.0, crop="v", grade=GRADE_COOL),
     "s2bg":  dict(src="4915.mp4", ss=2.0, dur=7.0, crop="16x9", cx=0.5, grade=GRADE_DOC),
     "crime": dict(src="ai_crime.mp4", ss=0.0, dur=5.0, crop="v", grade=GRADE_DOC),
@@ -75,5 +75,7 @@ SHOTS = {
     "smoke": dict(src="1968.mp4", ss=0.0, dur=8.0, crop="v", grade="eq=brightness=-0.02:saturation=0.0"),
 }
 
-# Ponto do plano do gancho (s) que entra no frame 0 (logo antes da mão bater o dinheiro).
-HOOK_SRC0 = 0.0
+# Ponto do plano do gancho (s) que entra no frame 0: o punho já descendo; o impacto no
+# maço (~0,92 s no plano) cai em HOOK_IMPACT na timeline.
+HOOK_SRC0 = 0.72
+HOOK_IMPACT = 0.20

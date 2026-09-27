@@ -8,7 +8,7 @@ import subprocess
 
 import numpy as np
 
-from timeline import w, VO_AT, DUR
+from timeline import w, VO_AT, DUR, HOOK_IMPACT
 import ui
 
 KIT = os.environ.get("KIT", "/home/user/kit")
@@ -73,7 +73,7 @@ def mix(out):
     t_cut = w("l1", 3) - 0.04
     place(bed, sfx(724), 0.0, db=-6, fout=0.04, dur=t_cut)
     place(bed, sfx(1641), 0.0, db=-15, fout=0.04, dur=t_cut)
-    place(fx, sfx(788), 0.0, db=-4)
+    place(fx, sfx(788), HOOK_IMPACT, db=-3)                     # punho no dinheiro
     for k in range(3):
         place(fx, sfx(2299), w("l1", k), db=-7)                  # SEM / BET / LEGAL,
     place(fx, sfx(2951), t_cut, db=-11)
