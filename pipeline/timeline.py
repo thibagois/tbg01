@@ -68,7 +68,7 @@ SHOTS = {
     "cash":  dict(src="46980.mp4", ss=4.0, dur=3.0, crop="16x9", cx=0.5, grade=GRADE_DOC, sharpen=True),
     "mask":  dict(src="24035.mp4", ss=2.0, dur=3.0, crop="16x9", cx=0.5, grade=GRADE_DOC, sharpen=True),
     "cctv":  dict(src="31372.mp4", ss=1.5, dur=3.0, crop="16x9", cx=0.3,
-                  grade="eq=contrast=1.15:brightness=-0.05:saturation=0.0"),
+                  grade="eq=contrast=1.12:brightness=0.04:gamma=1.25:saturation=0.0"),
     "smoke": dict(src="1968.mp4", ss=0.0, dur=8.0, crop="v", grade="eq=brightness=-0.02:saturation=0.0"),
 }
 

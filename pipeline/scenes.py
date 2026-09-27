@@ -116,7 +116,7 @@ class S2(Scene):
     def screen(self, t):
         if t < self.t_sair:
             scr = self.legal.copy()
-            amt = prog(t, self.t_sair - 0.3, self.t_sair)
+            amt = prog(t, self.t_sair - 0.14, self.t_sair)
         elif t < self.t_mas:
             scr = self.down.copy()
             amt = max(1 - prog(t, self.t_sair, self.t_sair + 0.12), prog(t, self.t_mas - 0.18, self.t_mas))
