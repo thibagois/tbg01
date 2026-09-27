@@ -34,7 +34,12 @@ def sfx(i):
 
 
 def place(buf, x, t, db=0.0, fin=0.004, fout=0.02, dur=None, align="start", skip=0.0):
+    """align: 'start' (início do arquivo em t), 'peak' (pico em t, com a subida antes) ou
+    'hit' (corta a subida e começa 30 ms antes do pico, para batidas secas no frame)."""
     x = x[int(skip * SR):]
+    if align == "hit":
+        x = x[max(0, int(np.argmax(np.abs(x).max(1))) - int(0.03 * SR)):]
+        t -= 0.03
     if dur is not None:
         x = x[:int(dur * SR)]
     x = x.copy()
@@ -73,7 +78,8 @@ def mix(out):
     t_cut = w("l1", 3) - 0.04
     place(bed, sfx(724), 0.0, db=-6, fout=0.04, dur=t_cut)
     place(bed, sfx(1641), 0.0, db=-15, fout=0.04, dur=t_cut)
-    place(fx, sfx(788), HOOK_IMPACT, db=-3)                     # punho no dinheiro
+    place(fx, sfx(2951), 0.0, db=-8)                            # glitch do frame 0
+    place(fx, sfx(788), HOOK_IMPACT, db=-3, align="peak")       # punho no dinheiro
     for k in range(3):
         place(fx, sfx(2299), w("l1", k), db=-7)                  # SEM / BET / LEGAL,
     place(fx, sfx(2951), t_cut, db=-11)
@@ -88,7 +94,7 @@ def mix(out):
     for i in range(n):
         pid = (2357, 2356, 2354)[i % 3]
         place(fx, sfx(pid), t_mas + 0.1 + i * span / (n - 1), db=-15 + (i % 2) * 2)
-    place(fx, sfx(788), t_slam, db=-5)                          # O ILEGAL CONTINUA.
+    place(fx, sfx(788), t_slam, db=-5, align="hit")             # O ILEGAL CONTINUA.
     place(fx, sfx(498), t_slam, db=-8)
     place(fx, sfx(1143), 8.9, db=-8, align="peak")              # transição
     # S3
@@ -111,8 +117,8 @@ def mix(out):
     # S5 (silêncio + locução)
     place(fx, sfx(2594), w("l5", 9) - 0.05, db=-17)             # lampejo do ILEGAL
     place(fx, sfx(559), w("l6", 0), db=-9)
-    place(fx, sfx(2900), w("l6", 3), db=-3, fout=0.4, dur=DUR - w("l6", 3))  # SÓ RESTA O CRIME.
-    place(fx, sfx(788), w("l6", 3), db=-8)
+    place(fx, sfx(2900), w("l6", 3), db=-3, fout=0.4, dur=DUR - w("l6", 3), align="hit")  # SÓ RESTA O CRIME.
+    place(fx, sfx(788), w("l6", 3), db=-8, align="hit")
 
     # ducking da cama sob a voz
     env = np.abs(vo).max(1)
