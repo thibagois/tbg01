@@ -113,8 +113,8 @@ class S1(Scene):
         s = 1 + 0.25 * (1 - e_outexpo(prog(t, self.t_cut, self.t_cut + 0.2)))
 
         def draw(L):
-            paste_text(L, "O QUE", self.red, rgba(C["red"]), W / 2, 640, anchor="ms", alpha=on, scale=s)
-            paste_text(L, "SOBRA?", self.red, rgba(C["red"]), W / 2, 930, anchor="ms", alpha=on, scale=s)
+            paste_text(L, "O QUE", self.red, rgba(C["red"]), W / 2, 560, anchor="ms", alpha=on, scale=s)
+            paste_text(L, "SOBRA?", self.red, rgba(C["red"]), W / 2, 850, anchor="ms", alpha=on, scale=s)
 
         red_glow_text(lay, draw, 34, 0.9 * on)
         return over(img, lay)
