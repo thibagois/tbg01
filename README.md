@@ -7,7 +7,8 @@ banco de imagens gratuito (Mixkit) e poucos planos gerados no Higgsfield.
 
 | Tempo | Cena | Imagem | Texto na tela |
 |---|---|---|---|
-| 0–3,3 s | Tela preta, celular acende | Plano de IA (Kling 3.0): celular no escuro | SEM BET LEGAL, / **O QUE SOBRA?** |
+| 0–1,5 s | Gancho | Plano de IA (Kling 3.0): punho batendo um maço de dinheiro numa mesa cheia de celulares, sob luz de sirene; flashes subliminares de 2 frames do resto do filme | SEM / BET / LEGAL, (gigante, uma palavra por batida) |
+| 1,5–3,3 s | Corte seco, silêncio | Plano de IA: celular acende no escuro | **O QUE SOBRA?** |
 | 3,3–8,9 s | A bet legal sai do ar, sites clandestinos pipocam | Celular desenhado: site regulado (fictício) → "SITE FORA DO AR / Erro 451" → cassino clandestino; 10 pop-ups de sites piratas | O **ILEGAL** CONTINUA. |
 | 8,9–15,6 s | Mercado clandestino | IA: sala clandestina com rack de celulares (HUD de vigilância) · Mixkit: mensagens de golpe · IA: máquina contando dinheiro + extrato de PIX · Mixkit: mascarado em data center + rede criminosa · Mixkit: câmera de segurança | GOLPES. / LAVAGEM DE DINHEIRO. / **CRIME ORGANIZADO.** |
 | 15,6–21,6 s | Neon | Placas de neon desenhadas: LEGAL falha e apaga com faíscas; ILEGAL continua aceso | — |
@@ -35,12 +36,12 @@ Dependências: Python 3 com Pillow e numpy, ffmpeg com libx264.
 
 ## Créditos e licenças
 
-- **Higgsfield** (≈ 22 créditos no total): 3 planos Kling 3.0 std 5 s sem som
-  (abertura, sala clandestina, máquina de contar dinheiro) e locução
-  Text-to-Speech V2 / ElevenLabs, voz "Orion".
+- **Higgsfield** (≈ 30 créditos no total): 4 planos Kling 3.0 std 5 s sem som
+  (gancho, abertura, sala clandestina, máquina de contar dinheiro) e locução
+  Text-to-Speech V2 / ElevenLabs, voz "Orion" ("bet" grafado "bétchi" para a pronúncia brasileira).
 - **Mixkit** (licença gratuita Mixkit): vídeos 4915, 51123, 31372, 46980, 24035, 1968;
   efeitos sonoros 1143, 2908, 788, 2900, 498, 559, 1492, 2595, 1457, 2594, 2946,
-  2951, 2354, 2356, 2357, 497, 2132, 1455, 2749, 2745, 784.
+  2951, 2354, 2356, 2357, 497, 2132, 1455, 2749, 2745, 784, 1641, 724, 2299.
 - **Fontes** (SIL OFL, Google Fonts): Anton, Tilt Neon, Barlow, Barlow Condensed, Space Mono.
 
 Marcas, sites e URLs mostrados no vídeo são fictícios.
