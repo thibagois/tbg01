@@ -53,7 +53,7 @@ def screen_legal():
     d = ImageDraw.Draw(img)
     status_bar(d)
     d.rectangle((0, 80, SC_W, 190), fill=(14, 36, 28))
-    d.text((34, 150), "APOSTA CERTA", font=F("BarlowCondensed-Black.ttf", 50), fill=(240, 244, 240), anchor="ls")
+    d.text((34, 150), "JOGO CLARO", font=F("BarlowCondensed-Black.ttf", 50), fill=(240, 244, 240), anchor="ls")
     d.text((34, 176), ".bet.br", font=F("SpaceMono-Bold.ttf", 20), fill=C["green"], anchor="ls")
     # selo
     d.rounded_rectangle((SC_W - 214, 112, SC_W - 26, 158), 23, fill=C["green"])
@@ -136,7 +136,7 @@ POPUPS = [
     # (url, título, subtítulo, estilo, x, y, rot)
     ("b3t-pix777.xyz", "BÔNUS DE 500%", "no primeiro depósito", "win", 40, 250, -4),
     ("cassino-vip24h.top", "SAQUE NA HORA VIA PIX", "sem limite de valor", "note", 470, 420, 3),
-    ("t.me/sinais_vip_green", "GRUPO VIP DE SINAIS", "vagas limitadas — entre agora", "win", 10, 700, 5),
+    ("grupo-sinais-vip.xyz", "GRUPO VIP DE SINAIS", "vagas limitadas — entre agora", "win", 10, 700, 5),
     ("apostamax-br.vip", "SEM CPF. SEM VERIFICAÇÃO.", "cadastro em 10 segundos", "note", 420, 860, -5),
     ("roleta-premiada.click", "GIRE E GANHE R$ 1.000", "oferta expira em 04:59", "win", 60, 1080, -2),
     ("bet-ilimitada.online", "DEPÓSITO MÍNIMO R$ 1", "aceitamos cartão de terceiros", "note", 450, 170, 6),

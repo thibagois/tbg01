@@ -19,7 +19,7 @@ done < "${HF_ASSETS:?defina HF_ASSETS}"
 wait
 
 # Vídeos Mixkit (id:resolução máxima disponível)
-for pair in 4915:2160 51123:2160 31372:2160 46980:720 47801:720 1968:1080; do
+for pair in 4915:2160 51123:2160 31372:2160 46980:720 24035:720 1968:1080; do
   id=${pair%%:*}; q=${pair##*:}
   curl -sf -o "src/$id.mp4" "https://assets.mixkit.co/videos/$id/$id-$q.mp4" &
 done

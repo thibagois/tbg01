@@ -18,10 +18,21 @@ from timeline import SCENES, FPS, W, H, NFRAMES
 TRANSITIONS = [3.3, 8.9, 15.6]
 
 
+class LazyScenes(dict):
+    """Cria cada cena só quando o primeiro frame dela é pedido (economiza RAM por processo)."""
+
+    def __init__(self):
+        super().__init__()
+        import scenes
+        self.mod, self.clips = scenes, common.Clips()
+
+    def __missing__(self, name):
+        self[name] = getattr(self.mod, name.upper())(self.clips)
+        return self[name]
+
+
 def make_scenes():
-    import scenes
-    clips = common.Clips()
-    return {n: getattr(scenes, n.upper())(clips) for n, a, b in SCENES}
+    return LazyScenes()
 
 
 def scene_at(t):
@@ -55,7 +66,7 @@ def render_range(args):
     f0, f1, out = args
     scn = make_scenes()
     enc = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
-                            "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", "15",
+                            "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "fast", "-crf", "15", "-threads", "3",
                             "-pix_fmt", "yuv420p", "-g", "30", "-bf", "0", out], stdin=subprocess.PIPE)
     t0 = time.time()
     for fi in range(f0, f1):
@@ -80,7 +91,7 @@ def stills(times, out, tile=(360, 640), cols=5):
     sheet.save(out, quality=88)
 
 
-def full(outdir, workers=8):
+def full(outdir, workers=6):
     os.makedirs(outdir, exist_ok=True)
     n = workers
     bounds = [round(i * NFRAMES / n) for i in range(n + 1)]

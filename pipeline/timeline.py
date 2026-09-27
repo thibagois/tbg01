@@ -66,8 +66,8 @@ SHOTS = {
     "scam":  dict(src="51123.mp4", ss=1.5, dur=4.0, crop="16x9", cx=0.46, grade=GRADE_DOC),
     "money": dict(src="ai_money.mp4", ss=0.0, dur=5.0, crop="v", grade=GRADE_DOC),
     "cash":  dict(src="46980.mp4", ss=4.0, dur=3.0, crop="16x9", cx=0.5, grade=GRADE_DOC, sharpen=True),
-    "mask":  dict(src="47801.mp4", ss=2.5, dur=3.0, crop="16x9", cx=0.5, grade=GRADE_DOC, sharpen=True),
-    "cctv":  dict(src="31372.mp4", ss=7.0, dur=3.0, crop="16x9", cx=0.62,
+    "mask":  dict(src="24035.mp4", ss=2.0, dur=3.0, crop="16x9", cx=0.5, grade=GRADE_DOC, sharpen=True),
+    "cctv":  dict(src="31372.mp4", ss=1.5, dur=3.0, crop="16x9", cx=0.3,
                   grade="eq=contrast=1.15:brightness=-0.05:saturation=0.0"),
     "smoke": dict(src="1968.mp4", ss=0.0, dur=8.0, crop="v", grade="eq=brightness=-0.02:saturation=0.0"),
 }
