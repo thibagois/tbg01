@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 import ui
 from common import (C, F, fit_font, prog, clamp, lerp, e_out3, e_inout3, e_outexpo, e_outback, hash01, rgba,
                     paste_text, glow, vgrad, zoom, darken, kit_meta, shake_at, flash_at)
-from timeline import W, H, FPS, w, OP_LIGHT_TARGET
+from timeline import W, H, FPS, w, HOOK_SRC0
 
 BLACK = Image.new("RGB", (W, H), C["black"])
 WHITE = Image.new("RGB", (W, H), (255, 255, 255))
@@ -50,33 +50,81 @@ class Scene:
 
 # ------------------------------------------------------------------ S1
 class S1(Scene):
-    """Tela preta, celular acende. SEM BET LEGAL, / O QUE SOBRA?"""
+    """Gancho: dinheiro batendo na mesa sob luz de sirene, SEM / BET / LEGAL, batendo gigante,
+    flashes subliminares do resto do filme; corte seco para o celular acendendo: O QUE SOBRA?"""
 
     def __init__(self, clips):
         super().__init__(clips)
-        self.src0 = max(0.0, kit_meta()["op_light"] - OP_LIGHT_TARGET)
-        self.f = F("Anton.ttf", 150)
-        self.grad = vgrad(W, H, [(0, (0, 0, 0, 170)), (0.42, (0, 0, 0, 60)), (0.6, (0, 0, 0, 0)), (1, (0, 0, 0, 0))])
+        self.src_op = max(0.0, kit_meta()["op_light"] - 0.04)
+        self.t_cut = w("l1", 3) - 0.04
+        self.slams = [w("l1", 0), w("l1", 1), w("l1", 2)]
+        self.big = fit_font("Anton.ttf", "LEGAL,", 900, 340)
+        self.red = fit_font("Anton.ttf", "SOBRA?", 900, 320)
+        self.inserts = {self.slams[0]: ("mask", 1.2), self.slams[1]: ("crime", 2.4), self.slams[2]: ("cctv", 1.4)}
+        self.grad = vgrad(W, H, [(0, (0, 0, 0, 150)), (0.5, (0, 0, 0, 40)), (0.62, (0, 0, 0, 0)), (1, (0, 0, 0, 0))])
+        xs = np.linspace(0, 1, W, dtype=np.float32)[None, :, None]
+        self.siren_l = np.clip(1.3 - xs * 2.2, 0, 1) * np.array([255, 20, 30], np.float32)
+        self.siren_r = np.clip(xs * 2.2 - 0.9, 0, 1) * np.array([30, 60, 255], np.float32)
+
+    def siren(self, img, t, k=1.0):
+        ph = (t % 0.26) / 0.26
+        a = np.asarray(img).astype(np.float32)
+        if ph < 0.5:
+            a += self.siren_l * (0.55 * k * (1 - ph * 1.6))
+        else:
+            a += self.siren_r * (0.5 * k * (1 - (ph - 0.5) * 1.6))
+        return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGB")
 
     def render(self, t, fi):
-        img = self.clips.get("op", self.src0 + t)
-        img = zoom(img, 1.0 + 0.07 * e_inout3(prog(t, 0, 3.3)), 0.5, 0.66)
-        k = e_out3(prog(t, 0.05, 0.55))
-        if k < 1:
-            img = Image.blend(BLACK, img, k)
+        if t < self.t_cut:
+            ins = next(((n, s0) for tw, (n, s0) in self.inserts.items() if 0 <= t - tw < 0.067), None)
+            if ins:
+                img = self.clips.get(ins[0], ins[1])
+                img = Image.blend(img, Image.new("RGB", (W, H), (200, 0, 10)), 0.35)
+            else:
+                img = self.clips.get("hook", HOOK_SRC0 + t)
+                punch = 0.22 * (1 - e_outexpo(prog(t, 0, 0.35)))
+                img = zoom(img, 1.04 + punch + 0.05 * prog(t, 0, self.t_cut), 0.5, 0.55)
+                img = darken(img, 1 - 0.4 * prog(t, 0.25, 0.45))
+                img = self.siren(img, t)
+            lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            d = ImageDraw.Draw(lay)
+            if int(t * 8) % 2 == 0:
+                d.rectangle((0, 0, W - 1, H - 1), outline=(232, 22, 30, 230), width=16)
+            for i, (wd, tw) in enumerate(zip(["SEM", "BET", "LEGAL,"], self.slams)):
+                if t < tw - 0.01:
+                    continue
+                p = prog(t, tw, tw + 0.12)
+                paste_text(lay, wd, self.big, rgba(C["white"]), W / 2, 700 + i * 300, anchor="ms",
+                           scale=1 + 0.7 * (1 - e_outexpo(p)), alpha=min(1, 0.3 + p * 2))
+            img = over(img, lay)
+            fl = max(flash_at(t, [0.0], 0.14, 0.9), flash_at(t, self.slams, 0.1, 0.3))
+            if fl > 0:
+                img = Image.blend(img, WHITE, fl)
+            return img
+        # corte seco: silêncio, o celular acende
+        img = self.clips.get("op", self.src_op + (t - self.t_cut))
+        img = zoom(img, 1.08 + 0.06 * e_inout3(prog(t, self.t_cut, 3.3)), 0.5, 0.64)
+        img = self.siren(img, t, 0.35 * (1 - prog(t, self.t_cut, self.t_cut + 0.6)))
         lay = self.grad.copy()
-        words_line(lay, ["SEM", "BET", "LEGAL,"], [w("l1", 0), w("l1", 1), w("l1", 2)], self.f,
-                   rgba(C["white"]), 560, t)
-        t2 = w("l1", 3)
-        if t >= t2 - 0.02:
-            dt = t - t2
-            on = 1.0 if dt > 0.22 else (1.0 if hash01("s1", int(dt * FPS)) > 0.4 else 0.2)
-            red_glow_text(lay, lambda L: paste_text(L, "O QUE SOBRA?", self.f, rgba(C["red"]), W / 2, 730,
-                                                    anchor="ms", alpha=on), 26, 0.8 * on)
+        dt = t - self.t_cut
+        on = 1.0 if dt > 0.2 else (1.0 if hash01("s1", int(dt * FPS)) > 0.4 else 0.15)
+        s = 1 + 0.25 * (1 - e_outexpo(prog(t, self.t_cut, self.t_cut + 0.2)))
+
+        def draw(L):
+            paste_text(L, "O QUE", self.red, rgba(C["red"]), W / 2, 640, anchor="ms", alpha=on, scale=s)
+            paste_text(L, "SOBRA?", self.red, rgba(C["red"]), W / 2, 930, anchor="ms", alpha=on, scale=s)
+
+        red_glow_text(lay, draw, 34, 0.9 * on)
         return over(img, lay)
 
     def fx(self, t):
-        return dict(glitch=0.35 if 0 <= t - w("l1", 3) < 0.07 else 0.0)
+        g = 0.0
+        if t < 0.1:
+            g = 0.7 * (1 - t / 0.1)
+        elif 0 <= t - self.t_cut < 0.07:
+            g = 0.55
+        return dict(glitch=g, shake=shake_at(t, [0.0] + self.slams, 0.22, 24))
 
 
 # ------------------------------------------------------------------ S2

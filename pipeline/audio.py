@@ -69,9 +69,15 @@ def mix(out):
     place(bed, sfx(2132), 15.75, db=-15, fin=0.05, fout=0.03, dur=CUT - 15.75)   # zumbido do neon
     place(bed, sfx(497), 19.6, db=-9, fin=0.2, fout=0.03, dur=CUT - 19.6)        # batimento
 
-    # S1
-    place(fx, sfx(2354), 0.72, db=-11)                          # celular acende
-    place(fx, sfx(2946), w("l1", 3), db=-14)                    # O QUE SOBRA?
+    # S1 (gancho): braaam + sirene cortados secos no "o que sobra?"
+    t_cut = w("l1", 3) - 0.04
+    place(bed, sfx(724), 0.0, db=-6, fout=0.04, dur=t_cut)
+    place(bed, sfx(1641), 0.0, db=-15, fout=0.04, dur=t_cut)
+    place(fx, sfx(788), 0.0, db=-4)
+    for k in range(3):
+        place(fx, sfx(2299), w("l1", k), db=-7)                  # SEM / BET / LEGAL,
+    place(fx, sfx(2951), t_cut, db=-11)
+    place(fx, sfx(2354), t_cut + 0.02, db=-10)                  # celular acende
     place(fx, sfx(1492), 3.3, db=-9, align="peak")              # transição
     # S2
     place(fx, sfx(1457), w("l2", 3) - 0.25, db=-13, dur=0.5)    # site caindo

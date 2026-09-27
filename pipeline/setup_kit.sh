@@ -24,7 +24,7 @@ for pair in 4915:2160 51123:2160 31372:2160 46980:720 24035:720 1968:1080; do
   curl -sf -o "src/$id.mp4" "https://assets.mixkit.co/videos/$id/$id-$q.mp4" &
 done
 # Efeitos sonoros Mixkit
-for id in 1143 2908 788 2900 498 559 1492 2595 1457 2594 2946 2951 2354 2356 2357 497 2132 1455 2749 2745 784; do
+for id in 1143 2908 788 2900 498 559 1492 2595 1457 2594 2946 2951 2354 2356 2357 497 2132 1455 2749 2745 784 1641 724 2299; do
   curl -sf -o "src/sfx_$id.mp3" "https://assets.mixkit.co/active_storage/sfx/$id/$id-preview.mp3" &
 done
 wait

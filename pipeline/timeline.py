@@ -36,7 +36,7 @@ VO_WORDS = {
 }
 
 # Onde cada fala entra na timeline (segundos).
-VO_AT = {"l1": 0.90, "l2": 3.50, "l3": 9.00, "l4": 15.90, "l5": 22.00, "l6": 26.70}
+VO_AT = {"l1": 0.35, "l2": 3.50, "l3": 9.00, "l4": 15.90, "l5": 22.00, "l6": 26.70}
 
 
 def w(line, idx, end=False):
@@ -47,7 +47,7 @@ def w(line, idx, end=False):
 
 # Cenas: (nome, início, fim)
 SCENES = [
-    ("s1", 0.0, 3.3),    # celular acende / SEM BET LEGAL, O QUE SOBRA?
+    ("s1", 0.0, 3.3),    # gancho: dinheiro + sirene, SEM / BET / LEGAL, -> O QUE SOBRA?
     ("s2", 3.3, 8.9),    # bet legal sai do ar, sites clandestinos pipocam
     ("s3", 8.9, 15.6),   # golpes / lavagem / crime organizado
     ("s4", 15.6, 21.6),  # neon: LEGAL apaga, ILEGAL continua aceso
@@ -61,6 +61,8 @@ SCENES = [
 GRADE_DOC = "eq=contrast=1.12:brightness=-0.035:saturation=0.72:gamma=0.96,colorbalance=rs=-0.05:bs=0.06:rh=0.04:bh=-0.03"
 GRADE_COOL = "eq=contrast=1.10:brightness=-0.02:saturation=0.70,colorbalance=rs=-0.06:bs=0.08:rm=-0.02:bm=0.03"
 SHOTS = {
+    "hook":  dict(src="ai_hook.mp4", ss=0.0, dur=5.0, crop="v",
+                  grade="eq=contrast=1.18:brightness=-0.02:saturation=0.85,colorbalance=rs=-0.03:bs=0.04"),
     "op":    dict(src="ai_opening.mp4", ss=0.0, dur=5.0, crop="v", grade=GRADE_COOL),
     "s2bg":  dict(src="4915.mp4", ss=2.0, dur=7.0, crop="16x9", cx=0.5, grade=GRADE_DOC),
     "crime": dict(src="ai_crime.mp4", ss=0.0, dur=5.0, crop="v", grade=GRADE_DOC),
@@ -73,6 +75,5 @@ SHOTS = {
     "smoke": dict(src="1968.mp4", ss=0.0, dur=8.0, crop="v", grade="eq=brightness=-0.02:saturation=0.0"),
 }
 
-# Instante (s, no clipe de abertura) em que a tela do celular acende — medido
-# no prep (luminância média); a cena 1 alinha isso para ~0,7 s.
-OP_LIGHT_TARGET = 0.70
+# Ponto do plano do gancho (s) que entra no frame 0 (logo antes da mão bater o dinheiro).
+HOOK_SRC0 = 0.0
