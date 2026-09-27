@@ -76,7 +76,7 @@ def mix(out):
 
     # S1 (gancho): braaam + sirene cortados secos no "o que sobra?"
     t_cut = w("l1", 3) - 0.04
-    place(bed, sfx(724), 0.0, db=-6, fout=0.04, dur=t_cut)
+    place(bed, sfx(724), 0.0, db=-9, fout=0.04, dur=t_cut)
     place(bed, sfx(1641), 0.0, db=-15, fout=0.04, dur=t_cut)
     place(fx, sfx(2951), 0.0, db=-8)                            # glitch do frame 0
     place(fx, sfx(788), HOOK_IMPACT, db=-3, align="peak")       # punho no dinheiro
