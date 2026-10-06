@@ -1,0 +1,41 @@
+{
+  "evento": "TRADEIMOB EXPERIENCE",
+  "timeline_origem": "PALESTRAS",
+  "prefixo_timelines": "PALESTRA",
+
+  "fps": 29.97,
+  "resolucao": [1920, 1080],
+
+  "divisao": {
+    "_ajuda": "modo: auto | cortes | marcadores | gaps. auto = usa 'cortes' se preenchido, senão marcadores da timeline, senão gaps.",
+    "modo": "auto",
+    "gap_minimo_seg": 90,
+    "duracao_minima_seg": 300,
+    "cortes": []
+  },
+
+  "graficos": {
+    "abertura_seg": 6.0,
+    "lower_third_seg": 8.0,
+    "lower_third_entra_aos_seg": 20.0,
+    "pasta_saida": "out"
+  },
+
+  "palestras": [
+    {
+      "palestrante": "Ramiro",
+      "cargo": "Idealizador · TradeImob Experience",
+      "tema": "Abertura TradeImob Experience"
+    },
+    {
+      "palestrante": "Nome do palestrante",
+      "cargo": "Cargo · Empresa",
+      "tema": "Tema da palestra"
+    },
+    {
+      "palestrante": "Rafa",
+      "cargo": "Cargo · Empresa",
+      "tema": "Tema da palestra"
+    }
+  ]
+}
