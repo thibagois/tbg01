@@ -15,6 +15,7 @@ Etapas:
   separar   duplica a timeline de origem uma vez por palestra e apaga o que
             está fora do bloco, preservando efeitos, transform, links, áudio
             e a segunda câmera. A original fica intacta.
+  renomear  renomeia as timelines criadas com os nomes do config.json.
   graficos  importa os .mov de out/ (render_graphics.py) e coloca a abertura e
             o lower third de cada palestra numa trilha nova no topo.
 
@@ -193,12 +194,56 @@ def analyze(project, cfg):
 
 
 # ---------------------------------------------------------------- separar
-def timeline_name(cfg, i, block):
+def people(p):
+    """[(nome, cargo)] de uma entrada do config (palestra solo ou conversa em dupla)."""
+    if p.get("palestrantes"):
+        return [(x.get("nome", ""), x.get("cargo", "")) for x in p["palestrantes"]]
+    return [(p.get("palestrante", ""), p.get("cargo", ""))] if p.get("palestrante") else []
+
+
+def timeline_name(cfg, i, block=None):
+    """'03 - Fulano' ou '04 - Fulano & Beltrano'."""
     talks = cfg.get("palestras", [])
     p = talks[i - 1] if i <= len(talks) else {}
-    who = block.get("nome") or p.get("palestrante") or ""
-    base = f"{cfg.get('prefixo_timelines', 'PALESTRA')} {i:02d}"
-    return f"{base} - {who}" if who else base
+    who = " & ".join(n for n, _ in people(p) if n) or (block or {}).get("nome", "")
+    return f"{i:02d} - {who}" if who else f"{i:02d} - {cfg.get('prefixo_timelines', 'PALESTRA').title()}"
+
+
+def set_hd(tl, cfg):
+    """Timeline própria em HD (ou o que estiver em config.resolucao)."""
+    w, h = cfg.get("resolucao", [1920, 1080])
+    ok = tl.SetSetting("useCustomSettings", "1")
+    ok = tl.SetSetting("timelineResolutionWidth", str(w)) and ok
+    ok = tl.SetSetting("timelineResolutionHeight", str(h)) and ok
+    return ok
+
+
+def audio_sources(tl, b):
+    """Trechos de áudio da trilha com mais cobertura, pra transcrição fora do Resolve."""
+    best, cover = None, -1
+    for idx in range(1, tl.GetTrackCount("audio") + 1):
+        items = tl.GetItemListInTrack("audio", idx) or []
+        c = sum(it.GetDuration() for it in items)
+        if c > cover:
+            best, cover = items, c
+    fps = fps_of(tl)
+    out = []
+    for it in best or []:
+        mpi = it.GetMediaPoolItem()
+        if not mpi:
+            continue
+        try:
+            src_in = it.GetSourceStartFrame()  # Resolve 18.5+
+        except Exception:
+            src_in = it.GetLeftOffset()
+        out.append({
+            "arquivo": mpi.GetClipProperty("File Path"),
+            "fps_clipe": float(mpi.GetClipProperty("FPS") or fps),
+            "entrada_frames": src_in,
+            "duracao_seg": it.GetDuration() / fps,
+            "posicao_seg": (it.GetStart() - b["inicio"]) / fps,
+        })
+    return out
 
 
 def split(project, cfg):
@@ -218,6 +263,8 @@ def split(project, cfg):
         if not tl:
             print(f"[{i:02d}] falhou ao duplicar a timeline")
             continue
+        if not set_hd(tl, cfg):
+            print(f"[{i:02d}] aviso: não consegui mudar a resolução da timeline")
         fora, cortados = [], []
         for kind, idx, it in all_items(tl):
             s, e = it.GetStart(), it.GetEnd()
@@ -241,7 +288,8 @@ def split(project, cfg):
         if cortados:
             print("      atenção, clipes atravessando o corte (ficaram inteiros): "
                   + ", ".join(cortados))
-        made.append({"n": i, "timeline": name, "inicio": b["inicio"], "fim": b["fim"]})
+        made.append({"n": i, "timeline": name, "inicio": b["inicio"], "fim": b["fim"],
+                     "audio": audio_sources(tl, b)})
     project.SetCurrentTimeline(src)
     state = HERE / "timelines_criadas.json"
     old = json.loads(state.read_text()) if state.exists() else []
@@ -271,36 +319,60 @@ def place_graphics(project, cfg):
     for m in made:
         n = m["n"]
         tl = find_timeline(project, m["timeline"])
-        files = [out / f"{n:02d}_abertura.mov", out / f"{n:02d}_lower_third.mov"]
-        if not tl or not all(f.exists() for f in files):
+        ab_file = out / f"{n:02d}_abertura.mov"
+        lt_files = sorted(out.glob(f"{n:02d}_lower_third*.mov"))  # 1 por pessoa
+        if not tl or not ab_file.exists() or not lt_files:
             print(f"[{n:02d}] pulei (timeline ou .mov faltando em {out})")
             continue
-        clips = mp.ImportMedia([str(f) for f in files]) or []
-        if len(clips) != 2:
-            print(f"[{n:02d}] falha ao importar {files}")
+        if any((tl.GetTrackName("video", i) or "") == "GRAFICOS"
+               for i in range(1, tl.GetTrackCount("video") + 1)):
+            print(f"[{n:02d}] já tem trilha GRAFICOS — pulei")
             continue
-        clips.sort(key=lambda c: c.GetName())  # abertura, lower_third
+        clips = mp.ImportMedia([str(ab_file)] + [str(f) for f in lt_files]) or []
+        if len(clips) != 1 + len(lt_files):
+            print(f"[{n:02d}] falha ao importar os .mov")
+            continue
+        clips.sort(key=lambda c: c.GetName())  # abertura, lower_third, lower_third_2
         project.SetCurrentTimeline(tl)
         fps = fps_of(tl)
         tl.AddTrack("video")
         track = tl.GetTrackCount("video")
         tl.SetTrackName("video", track, "GRAFICOS")
         t0 = tl.GetStartFrame()
-        ab, lt = clips
-        ab_len = int(ab.GetClipProperty("Frames") or round(g.get("abertura_seg", 6) * fps))
-        lt_len = int(lt.GetClipProperty("Frames") or round(g.get("lower_third_seg", 8) * fps))
+
+        def length(c, default):
+            return int(c.GetClipProperty("Frames") or round(default * fps))
+
+        ab = clips[0]
+        ab_len = length(ab, g.get("abertura_seg", 6))
         # abertura antes da palestra se houver espaço vazio, senão por cima do começo
         ab_rec = m["inicio"] - ab_len if m["inicio"] - ab_len >= t0 else m["inicio"]
-        ok = mp.AppendToTimeline([
-            {"mediaPoolItem": ab, "startFrame": 0, "endFrame": ab_len - 1,
-             "trackIndex": track, "recordFrame": ab_rec, "mediaType": 1},
-            {"mediaPoolItem": lt, "startFrame": 0, "endFrame": lt_len - 1,
-             "trackIndex": track, "recordFrame": m["inicio"] + int(lt_at * fps),
-             "mediaType": 1},
-        ])
+        plan = [{"mediaPoolItem": ab, "startFrame": 0, "endFrame": ab_len - 1,
+                 "trackIndex": track, "recordFrame": ab_rec, "mediaType": 1}]
+        at = m["inicio"] + int(lt_at * fps)
+        for lt in clips[1:]:  # numa conversa, um lower third depois do outro
+            lt_len = length(lt, g.get("lower_third_seg", 8))
+            plan.append({"mediaPoolItem": lt, "startFrame": 0, "endFrame": lt_len - 1,
+                         "trackIndex": track, "recordFrame": at, "mediaType": 1})
+            at += lt_len + int(4 * fps)
+        ok = mp.AppendToTimeline(plan)
         where = "antes do início" if ab_rec < m["inicio"] else "sobre o início"
-        print(f"[{n:02d}] {m['timeline']}: abertura {where}, lower third aos {lt_at:g}s"
-              + ("" if ok else "  (AppendToTimeline falhou)"))
+        print(f"[{n:02d}] {m['timeline']}: abertura {where}, {len(clips) - 1} lower third(s) "
+              f"a partir de {lt_at:g}s" + ("" if ok else "  (AppendToTimeline falhou)"))
+
+
+# ---------------------------------------------------------------- renomear
+def rename(project, cfg):
+    """Depois de preencher nomes/temas no config: renomeia as timelines criadas."""
+    state = HERE / "timelines_criadas.json"
+    made = json.loads(state.read_text()) if state.exists() else []
+    for m in made:
+        tl = find_timeline(project, m["timeline"])
+        new = timeline_name(cfg, m["n"])
+        if tl and new != m["timeline"] and tl.SetName(new):
+            print(f"[{m['n']:02d}] {m['timeline']} → {new}")
+            m["timeline"] = new
+    state.write_text(json.dumps(made, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 # ---------------------------------------------------------------- main
@@ -314,6 +386,8 @@ def main():
         analyze(project, cfg)
     elif cmd == "separar":
         split(project, cfg)
+    elif cmd == "renomear":
+        rename(project, cfg)
     elif cmd == "graficos":
         place_graphics(project, cfg)
     else:

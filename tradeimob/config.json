@@ -2,10 +2,11 @@
   "evento": "TRADEIMOB EXPERIENCE",
   "timeline_origem": "PALESTRAS",
   "prefixo_timelines": "PALESTRA",
-
   "fps": 29.97,
-  "resolucao": [1920, 1080],
-
+  "resolucao": [
+    1920,
+    1080
+  ],
   "divisao": {
     "_ajuda": "modo: auto | cortes | marcadores | gaps. auto = usa 'cortes' se preenchido, senão marcadores da timeline, senão gaps.",
     "modo": "auto",
@@ -13,29 +14,39 @@
     "duracao_minima_seg": 300,
     "cortes": []
   },
-
   "graficos": {
     "abertura_seg": 6.0,
     "lower_third_seg": 8.0,
     "lower_third_entra_aos_seg": 20.0,
     "pasta_saida": "out"
   },
-
   "palestras": [
     {
+      "tipo": "palestra",
       "palestrante": "Ramiro",
       "cargo": "Idealizador · TradeImob Experience",
-      "tema": "Abertura TradeImob Experience"
+      "tema": "(a definir pela transcrição)"
     },
     {
-      "palestrante": "Nome do palestrante",
-      "cargo": "Cargo · Empresa",
-      "tema": "Tema da palestra"
+      "tipo": "conversa",
+      "palestrantes": [
+        {
+          "nome": "Pessoa A",
+          "cargo": "Cargo · Empresa"
+        },
+        {
+          "nome": "Pessoa B",
+          "cargo": "Cargo · Empresa"
+        }
+      ],
+      "tema": "(a definir pela transcrição)"
     },
     {
+      "tipo": "palestra",
       "palestrante": "Rafa",
       "cargo": "Cargo · Empresa",
-      "tema": "Tema da palestra"
+      "tema": "(a definir pela transcrição)"
     }
-  ]
+  ],
+  "_palestras_ajuda": "Uma entrada por bloco, na ordem da analise. Solo: palestrante/cargo. Dupla: tipo conversa + palestrantes [{nome,cargo}]."
 }

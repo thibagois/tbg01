@@ -275,7 +275,7 @@ def lower_third_frame(t, dur, info, W, H):
     fn = font(54 * S, "ExtraBold")
     fc = font(28 * S, "SemiBold")
     fk = font(19 * S, "Bold")
-    name, cargo = info["palestrante"], info.get("cargo") or info.get("tema", "")
+    name, cargo = info["palestrante"], info.get("cargo", "")
     pad = int(34 * S)
     plate_w = int(max(text_w(name, fn), text_w(cargo, fc)) + pad * 2)
     plate_h = int(150 * S if cargo else 100 * S)
@@ -374,8 +374,17 @@ def load_config(path):
     talks = []
     for i, p in enumerate(cfg["palestras"], 1):
         info = dict(p)
+        if p.get("palestrantes"):  # conversa em dupla (ou painel)
+            info["pessoas"] = [(x.get("nome", ""), x.get("cargo", "")) for x in p["palestrantes"]]
+        else:
+            info["pessoas"] = [(p.get("palestrante", ""), p.get("cargo", ""))]
+        nomes = [n for n, _ in info["pessoas"] if n]
+        info["palestrante"] = " & ".join(nomes)
+        info["cargo"] = info["pessoas"][0][1] if len(nomes) == 1 else ""
+        tipo = p.get("tipo") or ("conversa" if len(nomes) > 1 else "palestra")
         info["evento"] = cfg.get("evento", "TRADEIMOB EXPERIENCE")
-        info["rotulo"] = f"PALESTRA {i:02d}"
+        info["rotulo"] = f"{tipo.upper()} {i:02d}"
+        info["tema"] = p.get("tema") or ""
         info["n"] = i
         talks.append(info)
     return cfg, talks
@@ -408,13 +417,17 @@ def main():
         abertura_frame(3.2, d_ab, info, W, H, wall).convert("RGB").save(
             out / "preview" / f"{n:02d}_abertura.png")
         lt = checker(W, H)
-        lt.alpha_composite(lower_third_frame(3.0, d_lt, info, W, H))
+        nome, cargo = info["pessoas"][0]
+        lt.alpha_composite(lower_third_frame(3.0, d_lt, dict(info, palestrante=nome, cargo=cargo), W, H))
         lt.convert("RGB").save(out / "preview" / f"{n:02d}_lower_third.png")
         if a.preview:
             print(f"prévia {n:02d} ok")
             continue
         render(abertura_frame, d_ab, fps, out / f"{n:02d}_abertura.mov", info, W, H, wall)
-        render(lower_third_frame, d_lt, fps, out / f"{n:02d}_lower_third.mov", info, W, H)
+        for k, (nome, cargo) in enumerate(info["pessoas"], 1):
+            suf = "" if k == 1 else f"_{k}"
+            pi = dict(info, palestrante=nome, cargo=cargo)
+            render(lower_third_frame, d_lt, fps, out / f"{n:02d}_lower_third{suf}.mov", pi, W, H)
         print(f"palestra {n:02d}: {info['palestrante']} — ok")
     print(f"arquivos em {out}")
 
